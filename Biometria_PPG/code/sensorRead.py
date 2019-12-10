@@ -12,9 +12,8 @@ portaSerial = serial.Serial(
     #bytesize=serial.EIGHTBITS,
     timeout=1
 )
-counter = 0
-sensorData = ""
 
+sensorData = ""
 logFile = open("logSensor.txt", "w+")
 
 delayTrash = time.time()
@@ -27,20 +26,27 @@ while ((time.time() - delayData <= 30)):
 #exclude first and last data signal
 sensorData = sensorData[sensorData.find("\\")+2:sensorData.rfind("n")-1]
 
-for i in range(len(sensorData)):
-    logFile.write(sensorData[i])
-logFile.close()
+#for i in range(len(sensorData)):
+#    logFile.write(sensorData[i])
+#logFile.close()
 
-with open("logSensor.txt", "rt") as log:
-    with open("out.txt", "wt") as out:
-        for line in log:
-            out.write(line.replace("\\n", '\n'))
-out.close()
-log.close()
+#with open("logSensor.txt", "rt") as log:
+#    with open("out.txt", "wt") as out:
+#        for line in log:
+#            out.write(line.replace("\\n", '\n'))
 
 signalData = list(map(int,sensorData.split("\\n")))
 dict = {'hart': signalData}
 df = pd.DataFrame(dict)
-df.to_csv('out.csv', index=False)
+
+csvName = "out"; i = 1; csvNumber = str(i)
+fileName = str(os.fsdecode(csvName+csvNumber+".csv"))
+
+while(os.path.exists(fileName)):
+    print(fileName)
+    i = i + 1
+    csvNumber = str(i)
+    fileName = str(os.fsdecode(csvName+csvNumber+".csv"))
+df.to_csv(fileName, index=False)
 
 exit()
